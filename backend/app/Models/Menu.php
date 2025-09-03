@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,6 +22,20 @@ class Menu extends Model
         'DATE_FIN',
         'DATE_CREATION',
     ];
+
+    protected $casts = [
+        "DATE_DEBUT" => 'datetime',
+        "DATE_FIN" => 'datetime',
+        "DATE_CREATION" => 'datetime',
+    ];
+
+    public function setHORAIREAttribute($value) {
+        if($value) {
+            $this->attributes['DATE_DEBUT'] = Carbon::parse($value);
+            $this->attributes['DATE_FIN'] = Carbon::parse($value);
+            $this->attributes['DATE_CREATION'] = Carbon::parse($value);
+        }
+    }
 
     public function dieteticien() {
         return $this->belongsTo(Dieteticien::class, 'ID_DIETETICIEN', 'ID_DIETETICIEN');

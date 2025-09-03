@@ -64,6 +64,14 @@ class AuthController extends Controller
         $tokenName = "API Token pour " . ($user->personne->NOM ?? $user->LOGIN);
         $token = $user->createToken($tokenName)->plainTextToken;
 
+        if ($user->ROLE === 'dieteticien') {
+            $user->load('dieteticien');
+        } else if ($user->ROLE === 'cuisinier') {
+            $user->load('cuisinier');
+        } else if ($user->ROLE === 'distributeur') {
+            $user->load('distributeur');
+        }
+
         return $this->success(
             [
                 'user' => $user,

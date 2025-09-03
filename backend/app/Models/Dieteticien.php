@@ -20,4 +20,8 @@ class Dieteticien extends Model
     public function utilisateur() {
         return $this->hasOne(Utilisateur::class, 'ID_UTILISATEUR', 'ID_UTILISATEUR');
     }
+
+    public function menus() {
+        return $this->hasMany(Menu::class, 'ID_DIETETICIEN', 'ID_DIETETICIEN');
+    }
 }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Menu, User, LogOut, Bell, Settings } from 'lucide-react';
+import { Menu, User, LogOut, Settings } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   onMenuToggle: () => void;
@@ -9,9 +10,10 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
   const { user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const navigate = useNavigate();
 
-  const getRoleBadgeColor = (role: string) => {
-    switch (role) {
+  const getRoleBadgeColor = (ROLE: string) => {
+    switch (ROLE) {
       case 'admin': return 'bg-red-100 text-red-800';
       case 'dieteticien': return 'bg-green-100 text-green-800';
       case 'cuisinier': return 'bg-yellow-100 text-yellow-800';
@@ -42,13 +44,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <button className="p-2 rounded-md hover:bg-gray-100 transition-colors relative">
-            <Bell className="h-5 w-5 text-gray-600" />
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-              3
-            </span>
-          </button>
-
           <div className="relative">
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
@@ -59,17 +54,20 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
               </div>
               <div className="hidden md:block text-left">
                 <p className="text-sm font-medium text-gray-900">
-                  {user?.prenom} {user?.nom}
+                  {user?.personne?.PRENOM} {user?.personne?.NOM}
                 </p>
-                <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getRoleBadgeColor(user?.role || '')}`}>
-                  {user?.role}
+                <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getRoleBadgeColor(user?.ROLE || '')}`}>
+                  {user?.ROLE}
                 </span>
               </div>
             </button>
 
             {showUserMenu && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                <button className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                <button
+                  className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                  onClick={() => navigate('/profile')}
+                >
                   <Settings className="h-4 w-4 mr-3" />
                   Mon Profil
                 </button>

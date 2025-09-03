@@ -29,4 +29,9 @@ class Allergie extends Model
     {
         return $this->belongsToMany(Ingredient::class, 'ingredient_allerdgie', 'ID_ALLERGIE', 'ID_INGREDIENT');
     }
+
+    public function patients()
+    {
+        return $this->belongsToMany(Patient::class, 'patient_allergie', 'ID_ALLERGIE', 'ID_PATIENT');
+    }
 }

@@ -21,14 +21,14 @@ function DataTable<T>({ data, columns, keyField }: DataTableProps<T>) {
             {columns.map((column) => (
               <th
                 key={column.key}
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
                 {column.label}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className="bg-white divide-y divide-gray-200 text-center">
           {data.map((item, index) => (
             <tr key={String(item[keyField]) || index} className="hover:bg-gray-50">
               {columns.map((column) => (

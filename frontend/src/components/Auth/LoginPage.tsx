@@ -8,18 +8,19 @@ const LoginPage: React.FC = () => {
   const { login, user } = useAuth();
   const { addNotification } = useNotifications();
   const [formData, setFormData] = useState({
-    login: '',
-    password: '',
+    LOGIN: '',
+    PASSWORD: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   if (user) {
-    const dashboardPath = user.role === 'admin' ? '/admin/dashboard' :
-                          user.role === 'dieteticien' ? '/dieteticien/dashboard' :
-                          user.role === 'cuisinier' ? '/cook/menus' :
-                          '/distributor/dashboard';
+    const dashboardPath = user.ROLE === 'admin' ? '/admin/dashboard' :
+                          user.ROLE === 'dieteticien' ? '/dieteticien/dashboard' :
+                          user.ROLE === 'cuisinier' ? '/cook/menus' :
+                          '/distributeur/dashboard';
+                          console.log(user);
     return <Navigate to={dashboardPath} replace />;
   }
 
@@ -28,7 +29,7 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
     setError('');
 
-    if (!formData.login || !formData.password) {
+    if (!formData.LOGIN || !formData.PASSWORD) {
       setError('Veuillez remplir tous les champs');
       setIsLoading(false);
       return;
@@ -64,8 +65,8 @@ const LoginPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <div className="mx-auto h-16 w-16 bg-blue-600 rounded-xl flex items-center justify-center">
-            <span className="text-white font-bold text-xl">HM</span>
+          <div className="mx-auto h-16 w-16 bg-blue-600 rounded-xl flex items-center justify-center"  style={{padding : '0px 50px'}}>
+            <span className="text-white font-bold text-xl">NITRIX</span>
           </div>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
             Système de Gestion des Repas
@@ -94,10 +95,10 @@ const LoginPage: React.FC = () => {
                 </div>
                 <input
                   id="login"
-                  name="login"
+                  name="LOGIN"
                   type="text"
                   required
-                  value={formData.login}
+                  value={formData.LOGIN}
                   onChange={handleChange}
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Votre nom d'utilisateur"
@@ -115,10 +116,10 @@ const LoginPage: React.FC = () => {
                 </div>
                 <input
                   id="password"
-                  name="password"
+                  name="PASSWORD"
                   type={showPassword ? 'text' : 'password'}
                   required
-                  value={formData.password}
+                  value={formData.PASSWORD}
                   onChange={handleChange}
                   className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Votre mot de passe"
@@ -155,23 +156,6 @@ const LoginPage: React.FC = () => {
             </button>
           </form>
 
-          <div className="mt-6 p-4 bg-gray-50 rounded-md">
-            <p className="text-xs text-gray-600 font-medium mb-2">Comptes de démonstration :</p>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div>
-                <span className="font-medium">Admin:</span> admin / password
-              </div>
-              <div>
-                <span className="font-medium">Diététicien:</span> diet / password
-              </div>
-              <div>
-                <span className="font-medium">Cuisinier:</span> cook / password
-              </div>
-              <div>
-                <span className="font-medium">Distributeur:</span> dist / password
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

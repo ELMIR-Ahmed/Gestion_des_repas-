@@ -16,6 +16,7 @@ class MenuStandard extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'ID_SERVICE',
         'ID_MENU'
     ];
 
@@ -25,5 +26,9 @@ class MenuStandard extends Model
     public function menu()
     {
         return $this->belongsTo(Menu::class, 'ID_MENU', 'ID_MENU');
+    }
+
+    public function service() {
+        return $this->belongsTo(Service::class, 'ID_SERVICE', 'ID_SERVICE');
     }
 }

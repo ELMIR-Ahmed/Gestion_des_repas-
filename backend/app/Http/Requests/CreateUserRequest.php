@@ -26,7 +26,7 @@ class CreateUserRequest extends FormRequest
             'PRENOM' => ['required', 'string', 'min:3'],
             'LOGIN' => ['required', 'string', 'unique:utilisateur'],
             'PASSWORD' => ['required', 'string', 'min:6'],
-            'ROLE' => ['required', 'string', 'in:dieteticien,cuisinier,distributeur'],
+            'ROLE' => ['required', 'string', 'in:dieteticien,cuisinier,distributeur,admin'],
 
             // validation de données du dieteticien :
             'NUM_LICENCE' => ['required_if:ROLE,dieteticien', 'string'],

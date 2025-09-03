@@ -18,6 +18,7 @@ import AllergyManagement from './components/Dieteticien/AllergyManagement';
 import MenuManagement from './components/Dieteticien/MenuManagement';
 import MenuConsultation from './components/Cook/MenuConsultation';
 import DistributorDashboard from './components/Distributor/DistributorDashboard';
+import Profile from './components/Profile';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?: string[] }> = ({ 
   children, 
@@ -37,7 +38,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?: strin
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
+  if (allowedRoles && !allowedRoles.includes(user.ROLE)) {
     return <Navigate to="/unauthorized" replace />;
   }
 
@@ -50,7 +51,7 @@ const AppRoutes: React.FC = () => {
   const getDefaultRoute = () => {
     if (!user) return '/login';
     
-    switch (user.role) {
+    switch (user.ROLE) {
       case 'admin': return '/admin/dashboard';
       case 'dieteticien': return '/dieteticien/dashboard';
       case 'cuisinier': return '/cook/menus';
@@ -63,13 +64,19 @@ const AppRoutes: React.FC = () => {
     <Routes>
       {/* Public routes */}
       <Route path="/login" element={<LoginPage />} />
-      
+
+
       {/* Protected routes */}
       <Route path="/" element={
         <ProtectedRoute>
           <Layout />
         </ProtectedRoute>
       }>
+        <Route path="/profile" element={
+          <ProtectedRoute allowedRoles={['admin', 'dieteticien', 'cuisinier', 'distributeur']}>
+            <Profile />
+          </ProtectedRoute>
+        } />
         {/* Admin routes */}
         <Route path="admin/dashboard" element={
           <ProtectedRoute allowedRoles={['admin']}>

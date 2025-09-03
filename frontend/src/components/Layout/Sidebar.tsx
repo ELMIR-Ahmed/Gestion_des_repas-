@@ -12,7 +12,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth();
 
   const getNavigationItems = () => {
-    switch (user?.role) {
+    switch (user?.ROLE) {
       case 'admin':
         return [
           { to: '/admin/dashboard', icon: Home, label: 'Tableau de bord' },

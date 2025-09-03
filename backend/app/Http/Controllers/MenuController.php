@@ -15,7 +15,13 @@ class MenuController extends Controller
      */
     public function index()
     {
-        return $this->success(Menu::all());
+        $menus = Menu::with('dieteticien', 'repas.plats')->get();
+
+        if($menus->isEmpty()){
+            return $this->error(null, "Aucun Menu trouvé ! ", 404);
+        }
+
+        return $this->success($menus, '', 200);
     }
 
     /**
@@ -28,6 +34,8 @@ class MenuController extends Controller
             'DATE_DEBUT' => 'required|date',
             'DATE_CREATION' => 'required|date',
             'DATE_FIN' => 'required|date|after_or_equal:DATE_DEBUT',
+            'REPAS' => 'array',
+            'REPAS.*' => 'required|exists:repas,ID_REPAS'
         ]);
 
         $menu = Menu::create($request->only([
@@ -37,6 +45,10 @@ class MenuController extends Controller
             'DATE_FIN',
         ]));
 
+        if(isset($request['REPAS'])) {
+            $menu->repas()->attach($request['REPAS']);
+        }
+
         return $this->success($menu, 'Menu créé avec succès', 201);
     }
 
@@ -45,7 +57,7 @@ class MenuController extends Controller
      */
     public function show($id)
     {
-        $menu = Menu::find($id);
+        $menu = Menu::with('dieteticien', 'repas.plats')->find($id);
 
         if (!$menu) {
             return $this->error(null, 'Menu introuvable', 404);
@@ -70,6 +82,8 @@ class MenuController extends Controller
             'DATE_DEBUT' => 'sometimes|required|date',
             'DATE_CREATION' => 'sometimes|required|date',
             'DATE_FIN' => 'sometimes|required|date|after_or_equal:DATE_DEBUT',
+            'REPAS' => 'array',
+            'REPAS.*' => 'required|exists:repas,ID_REPAS'
         ]);
 
         $menu->update($request->only([
@@ -79,7 +93,9 @@ class MenuController extends Controller
             'DATE_FIN',
         ]));
 
-        return $this->success($menu, 'Menu mis à jour avec succès');
+        $menu->repas()->sync($request['REPAS']);
+
+        return $this->success($menu, 'Menu mis à jour avec succès', 200);
     }
 
     /**

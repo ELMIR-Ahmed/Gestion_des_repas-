@@ -22,24 +22,24 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'NOM' => ['required', 'string'],
-            'PRENOM' => ['required', 'string', 'min:3'],
-            'DATE_NAISSANCE' => ['required', 'date'],
-            'TELEPHONE' => ['required', 'string', 'regex:/^(0|\+212)[67]\d{8}$/'],
-            'GENRE' => ['required', 'string', 'in:homme,femme'],
-            'EMAIL' => ['required', 'email', 'unique:personne,EMAIL'],
-            'LOGIN' => ['required', 'string', 'unique:utilisateur'],
-            'PASSWORD' => ['required', 'string', 'min:6'],
-            'ROLE' => ['required', 'string', 'in:dieteticien,cuisinier,distributeur'],
+            'NOM' => ['sometimes', 'string'],
+            'PRENOM' => ['sometimes', 'string', 'min:3'],
+            'DATE_NAISSANCE' => ['sometimes', 'date'],
+            'TELEPHONE' => ['sometimes', 'string', 'regex:/^(0|\+212)[67]\d{8}$/'],
+            'GENRE' => ['sometimes', 'string', 'in:homme,femme'],
+            'EMAIL' => ['sometimes', 'email', 'unique:personne,EMAIL'],
+            'LOGIN' => ['sometimes', 'string', 'unique:utilisateur'],
+            'PASSWORD' => ['sometimes', 'string', 'nullable'],
+            'ROLE' => ['sometimes', 'string', 'in:dieteticien,cuisinier,distributeur,admin'],
 
             // validation de données du dieteticien :
-            'NUM_LICENCE' => ['required_if:ROLE,dieteticien', 'string'],
+            'NUM_LICENCE' => ['sometimes',  'string'],
 
             // validation de données du cuisinier : 
-            'TYPE_CUISINE' => ['required_if:ROLE,cuisinier', 'string'],
+            'TYPE_CUISINE' => ['sometimes', 'string'],
 
             // validation de données de distributeur :
-            'NUM_BADGE' => ['required_if:ROLE,distributeur', 'string'],
+            'NUM_BADGE' => ['sometimes', 'string'],
         ];
     }
 }

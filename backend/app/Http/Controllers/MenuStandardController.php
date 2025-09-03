@@ -15,7 +15,13 @@ class MenuStandardController extends Controller
      */
     public function index()
     {
-        return $this->success(MenuStandard::all(), "", 200);
+        $menus_standard = MenuStandard::with('service', 'menu.repas.plats')->get();
+
+        if($menus_standard->isEmpty()) {
+            return $this->error(null, 'Aucun menu standard trouvé !', 404);
+        }
+
+        return $this->success($menus_standard, "", 200);
     }
 
     /**
@@ -23,14 +29,16 @@ class MenuStandardController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'nom' => 'required|string|max:255',
-            'menu_id' => 'required|exists:menus,id',
+        $validatedData = $request->validate([
+            'ID_MENU' => 'required|exists:menu,ID_MENU',
+            'ID_SERVICE' => 'required|exists:service,ID_SERVICE',
         ]);
 
-        $menuStandard = MenuStandard::create($request->all());
+        $menuStandard = MenuStandard::create($validatedData);
 
-        return $this->success($menuStandard, 'MenuStandard created successfully', 201);
+        $menuStandard->load("service");
+
+        return $this->success($menuStandard, 'Menu Standard crée avec succès pour le service ' . $menuStandard->service->NOM_SERVICE  . ' !', 201);
     }
 
     /**
@@ -38,10 +46,10 @@ class MenuStandardController extends Controller
      */
     public function show($id)
     {
-        $menuStandard = MenuStandard::find($id);
+        $menuStandard = MenuStandard::with('service', 'menu.repas.plats')->find($id);
 
         if (!$menuStandard) {
-            return $this->error(null, 'MenuStandard not found', 404);
+            return $this->error(null, 'MenuStandard non trouvé !', 404);
         }
 
         return $this->success($menuStandard);
@@ -58,14 +66,14 @@ class MenuStandardController extends Controller
             return $this->error(null, 'MenuStandard not found', 404);
         }
 
-        $request->validate([
-            'nom' => 'sometimes|required|string|max:255',
-            'menu_id' => 'sometimes|required|exists:menus,id',
+        $validatedData = $request->validate([
+            'ID_MENU' => 'sometimes|exists:menu,ID_MENU',
+            'ID_SERVICE' => 'sometimes|exists:service,ID_SERVICE',
         ]);
 
-        $menuStandard->update($request->all());
+        $menuStandard->update($validatedData);
 
-        return $this->success($menuStandard, 'MenuStandard updated successfully');
+        return $this->success($menuStandard, 'MenuStandard updated successfully', 200);
     }
 
     /**
@@ -81,6 +89,6 @@ class MenuStandardController extends Controller
 
         $menuStandard->delete();
 
-        return $this->success(null, 'MenuStandard deleted successfully');
+        return $this->success(null, 'MenuStandard deleted successfully', 200);
     }
 }

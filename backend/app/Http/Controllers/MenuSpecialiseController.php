@@ -10,17 +10,19 @@ class MenuSpecialiseController extends Controller
 {
     use HttpResponses;
 
-    /**
-     * Liste des menus spécialisés.
-     */
+
     public function index()
     {
-        return $this->success(MenuSpecialise::all());
+        $menuSpecialise = MenuSpecialise::with('patient', 'menu.repas.plats')->get();
+
+        if ($menuSpecialise->isEmpty()) {
+            return $this->error(null, 'Aucun menu personnalisé trouvé ! ', 404);
+        }
+
+        return $this->success($menuSpecialise, '', 200);
     }
 
-    /**
-     * Création d'un menu spécialisé.
-     */
+
     public function store(Request $request)
     {
         $request->validate([
@@ -33,23 +35,19 @@ class MenuSpecialiseController extends Controller
         return $this->success($menuSpecialise, 'Menu spécialisé créé avec succès', 201);
     }
 
-    /**
-     * Affichage d'un menu spécialisé.
-     */
+
     public function show($id)
     {
-        $menuSpecialise = MenuSpecialise::find($id);
+        $menuSpecialise = MenuSpecialise::with('patient', 'menu.repas.plats')->find($id);
 
         if (!$menuSpecialise) {
-            return $this->error(null, 'Menu spécialisé introuvable', 404);
+            return $this->error(null, 'Menu personnalisé introuvable', 404);
         }
 
-        return $this->success($menuSpecialise);
+        return $this->success($menuSpecialise, '', 200);
     }
 
-    /**
-     * Mise à jour d'un menu spécialisé.
-     */
+
     public function update(Request $request, $id)
     {
         $menuSpecialise = MenuSpecialise::find($id);
@@ -68,9 +66,7 @@ class MenuSpecialiseController extends Controller
         return $this->success($menuSpecialise, 'Menu spécialisé mis à jour avec succès');
     }
 
-    /**
-     * Suppression d'un menu spécialisé.
-     */
+
     public function destroy($id)
     {
         $menuSpecialise = MenuSpecialise::find($id);

@@ -33,7 +33,7 @@ class AdminController extends Controller
                     $user->load('dieteticien');
                 } elseif ($user["ROLE"] === 'cuisinier') {
                         $user->load('cuisinier');
-                    } elseif ($user["ROLE"] = 'admin') {
+                    } elseif ($user["ROLE"] === 'admin') {
                             $user->load('admin');
                         } else {
                             $user->load('distributeur');
@@ -147,41 +147,80 @@ class AdminController extends Controller
             $user = Utilisateur::with('personne', $role)->find($userId);
 
 
-            $user->personne->update([
-                'NOM' => $validatedData['NOM'],
-                'PRENOM' => $validatedData['PRENOM'],
-                'DATE_NAISSANCE' => $validatedData['DATE_NAISSANCE'],
-                'TELEPHONE' => $validatedData['TELEPHONE'],
-                'GENRE' => $validatedData['GENRE'],
-                'EMAIL' => $validatedData['EMAIL'],
-
-            ]);
-
-            $user->update([
-                'LOGIN' => $validatedData['LOGIN'],
-                'PASSWORD' => Hash::make($validatedData['PASSWORD']),
-                'ROLE' => $validatedData['ROLE'],
-            ]);
-
-            switch ($role) {
-                case 'dieteticien':
-                    $user->dieteticien->update([
-                        'NUM_LICENCE' => $validatedData['NUM_LICENCE']
-                    ]);
-                    break;
-                case 'cuisinier':
-                    $user->cuisinier->update([
-                        'TYPE_CUISINE' => $validatedData['TYPE_CUISINE'],
-                    ]);
-                    break;
-                case 'distributeur':
-                    $user->distributeur->update([
-                        'NUM_BADGE' => $validatedData['NUM_BADGE'],
-                    ]);
-                    break;
-                default:
-                    break;
+            if(isset($request['NOM'])){
+                $user->personne->update([
+                    'NOM' => $validatedData['NOM']
+                ]);
             }
+
+            if(isset($request['PRENOM'])){
+                $user->personne->update([
+                    'PRENOM' => $validatedData['PRENOM']
+                ]);
+            }
+
+            if(isset($request['DATE_NAISSANCE'])){
+                $user->personne->update([
+                    'DATE_NAISSANCE' => $validatedData['DATE_NAISSANCE']
+                ]);
+            }
+
+            if(isset($request['TELEPHONE'])){
+                $user->personne->update([
+                    'TELEPHONE' => $validatedData['TELEPHONE']                
+                ]);
+            }     
+            
+            if(isset($request['GENRE'])){
+                $user->personne->update([
+                    'GENRE' => $validatedData['GENRE']                
+                ]);
+            }
+
+            if(isset($request['EMAIL'])){
+                $user->personne->update([
+                    'EMAIL' => $validatedData['EMAIL']
+                ]);
+            }
+            
+            
+            if(isset($request['PASSWORD']) && $request['PASSWORD'] !== null){
+                $user->update([
+                    'PASSWORD' => Hash::make($validatedData['PASSWORD'])
+                ]);
+            }
+
+            if(isset($request['LOGIN'])){
+                $user->update([
+                    'LOGIN' => $validatedData['LOGIN']
+                ]);
+            }
+
+            if(isset($request['ROLE'])){
+                $user->update([
+                    'ROLE' => $validatedData['ROLE']
+                ]);
+            }
+
+            // switch ($role) {
+            //     case 'dieteticien':
+            //         $user->dieteticien->update([
+            //             'NUM_LICENCE' => $validatedData['NUM_LICENCE']
+            //         ]);
+            //         break;
+            //     case 'cuisinier':
+            //         $user->cuisinier->update([
+            //             'TYPE_CUISINE' => $validatedData['TYPE_CUISINE'],
+            //         ]);
+            //         break;
+            //     case 'distributeur':
+            //         $user->distributeur->update([
+            //             'NUM_BADGE' => $validatedData['NUM_BADGE'],
+            //         ]);
+            //         break;
+            //     default:
+            //         break;
+            // }
 
             DB::commit();
 

@@ -1,252 +1,697 @@
-import React, { useState } from 'react';
-import { Plus, Search, Edit, Trash2, Building, Users, Bed, MapPin } from 'lucide-react';
+// import React, { useState, useEffect } from 'react';
+// import { Plus, Search, Edit, Trash2, Building, Users, Bed, AlertCircle } from 'lucide-react';
+// import DataTable from '../UI/DataTable';
+
+// interface Salle {
+//   ID_SALLE?: string;
+//   ID_SERVICE: string;
+//   NOM_SALLE: string;
+//   lits?: Lit[];
+//   service?: Service;
+// }
+
+// interface Service {
+//   ID_SERVICE: string;
+//   NOM_SERVICE: string;
+//   DESCRIPTION: string;
+//   salles?: Salle[];
+// }
+
+// interface Lit {
+//   ID_LIT: string;
+//   ID_SALLE: string;
+//   NUM_LIT: string;
+//   salle?: Salle;
+//   patient?: Patient;
+// }
+
+// interface Personne {
+//   ID_PERSONNE: string;
+//   NOM: string;
+//   PRENOM: string;
+//   DATE_NAISSANCE: string;
+//   GENRE: string;
+//   TELEPHONE: string;
+//   EMAIL: string;
+// }
+
+// interface Patient {
+//   ID_PATIENT: string;
+//   ID_PERSONNE: string;
+//   ID_LIT: string;
+//   DATE_ADMISSION: string;
+//   personne?: Personne;
+//   lit?: Lit;
+// }
+
+// const RoomManagement: React.FC = () => {
+//   const [salles, setSalles] = useState<Salle[]>([]);
+//   const [services, setServices] = useState<Service[]>([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState<string | null>(null);
+//   const [searchTerm, setSearchTerm] = useState('');
+//   const [serviceFilter, setServiceFilter] = useState<string>('');
+//   const [showModal, setShowModal] = useState(false);
+//   const [editingSalle, setEditingSalle] = useState<Salle | null>(null);
+//   const [formData, setFormData] = useState<Partial<Salle>>({});
+//   const [submitting, setSubmitting] = useState(false);
+
+//   const API_BASE_URL = 'http://127.0.0.1:8000/api';
+
+//   const fetchSalles = async () => {
+//     try {
+//       setLoading(true);
+//       const response = await fetch(`${API_BASE_URL}/salles`);
+//       if (!response.ok) {
+//         throw new Error(`Erreur HTTP: ${response.status}`);
+//       }
+//       const data = await response.json();
+      
+//       // Enrichir avec les informations du service
+//       const enrichedSalles = data.data.map((salle: Salle) => ({
+//         ...salle,
+//         service: services.find(s => s.ID_SERVICE === salle.ID_SERVICE)
+//       }));
+      
+//       setSalles(enrichedSalles);
+//       setError(null);
+//     } catch (err) {
+//       setError(`Erreur lors du chargement des salles: ${err instanceof Error ? err.message : 'Erreur inconnue'}`);
+//       console.error('Erreur fetch salles:', err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const fetchServices = async () => {
+//     try {
+//       const response = await fetch(`${API_BASE_URL}/services`);
+//       if (!response.ok) {
+//         throw new Error(`Erreur HTTP: ${response.status}`);
+//       }
+//       const data = await response.json();
+//       setServices(data.data || data);
+//     } catch (err) {
+//       console.error('Erreur fetch services:', err);
+//       setServices([]);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchServices();
+//     fetchSalles();
+//   }, []);
+
+//   const filteredSalles = salles.filter(salle => {
+//     const matchesSearch = salle.NOM_SALLE.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//                           (salle.service && salle.service.NOM_SERVICE.toLowerCase().includes(searchTerm.toLowerCase()));
+//     const matchesService = !serviceFilter || salle.ID_SERVICE === serviceFilter;
+    
+//     return matchesSearch && matchesService;
+//   });
+
+//   const handleAddSalle = () => {
+//     setEditingSalle(null);
+//     setFormData({
+//       ID_SERVICE: '',
+//       NOM_SALLE: ''
+//     });
+//     setShowModal(true);
+//   };
+
+//   const handleEditSalle = (salle: Salle) => {
+//     setEditingSalle(salle);
+//     setFormData({
+//       ID_SERVICE: salle.ID_SERVICE,
+//       NOM_SALLE: salle.NOM_SALLE
+//     });
+//     setShowModal(true);
+//   };
+
+//   const handleDeleteSalle = async (id: string) => {
+//     if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette salle ?')) {
+//       return;
+//     }
+
+//     try {
+//       const response = await fetch(`${API_BASE_URL}/salles/${id}`, {
+//         method: 'DELETE',
+//       });
+
+//       if (!response.ok) {
+//         throw new Error(`Erreur HTTP: ${response.status}`);
+//       }
+
+//       await fetchSalles();
+//     } catch (err) {
+//       setError(`Erreur lors de la suppression: ${err instanceof Error ? err.message : 'Erreur inconnue'}`);
+//     }
+//   };
+
+//   const handleSubmit = async () => {
+//     if (!formData.NOM_SALLE || !formData.ID_SERVICE) {
+//       setError('Veuillez remplir tous les champs obligatoires');
+//       return;
+//     }
+    
+//     setSubmitting(true);
+    
+//     try {
+//       const url = editingSalle 
+//         ? `${API_BASE_URL}/salles/${editingSalle.ID_SALLE}`
+//         : `${API_BASE_URL}/salles`;
+      
+//       const method = editingSalle ? 'PUT' : 'POST';
+      
+//       const response = await fetch(url, {
+//         method: method,
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({
+//           ID_SERVICE: parseInt(formData.ID_SERVICE as string),
+//           NOM_SALLE: formData.NOM_SALLE
+//         }),
+//       });
+
+//       if (!response.ok) {
+//         throw new Error(`Erreur HTTP: ${response.status}`);
+//       }
+
+//       await fetchSalles();
+//       setShowModal(false);
+//       setFormData({});
+//       setError(null);
+//     } catch (err) {
+//       setError(`Erreur lors de la sauvegarde: ${err instanceof Error ? err.message : 'Erreur inconnue'}`);
+//     } finally {
+//       setSubmitting(false);
+//     }
+//   };
+
+//   const columns = [
+//     {
+//       key: 'id',
+//       label: 'ID',
+//       render: (salle: Salle) => (
+//         <span className="font-mono text-sm text-gray-600">#{salle.ID_SALLE}</span>
+//       )
+//     },
+//     {
+//       key: 'identification',
+//       label: 'Identification',
+//       render: (salle: Salle) => (
+//         <div className="flex items-center space-x-2">
+//           <Building className="h-5 w-5 text-gray-400" />
+//           <div>
+//             <div className="font-medium text-gray-900">{salle.NOM_SALLE}</div>
+//             <div className="text-sm text-gray-500">{salle.service?.NOM_SERVICE || 'Service inconnu'}</div>
+//           </div>
+//         </div>
+//       )
+//     },
+//     {
+//       key: 'service',
+//       label: 'Service',
+//       render: (salle: Salle) => (
+//         <div>
+//           <div className="font-medium text-gray-900">{salle.service?.NOM_SERVICE || 'Service inconnu'}</div>
+//           <div className="text-sm text-gray-500">{salle.service?.DESCRIPTION || ''}</div>
+//           <div className="text-xs text-gray-400">ID: {salle.ID_SERVICE}</div>
+//         </div>
+//       )
+//     },
+//     {
+//       key: 'occupation',
+//       label: 'Lits',
+//       render: (salle: Salle) => (
+//         <div className="flex items-center space-x-2">
+//           <Bed className="h-4 w-4 text-gray-400" />
+//           <div>
+//             <div className="font-medium text-blue-600">
+//               {salle.lits ? salle.lits.length : 0} lits
+//             </div>
+//             <div className="text-xs text-gray-500">
+//               {salle.lits ? salle.lits.filter(lit => lit.patient).length : 0} occupés
+//             </div>
+//           </div>
+//         </div>
+//       )
+//     },
+//     {
+//       key: 'actions',
+//       label: 'Actions',
+//       render: (salle: Salle) => (
+//         <div className="flex space-x-2">
+//           <button
+//             onClick={() => handleEditSalle(salle)}
+//             className="text-blue-600 hover:text-blue-800 p-1"
+//             title="Modifier"
+//           >
+//             <Edit className="h-4 w-4" />
+//           </button>
+//           <button
+//             onClick={() => salle.ID_SALLE && handleDeleteSalle(salle.ID_SALLE)}
+//             className="text-red-600 hover:text-red-800 p-1"
+//             title="Supprimer"
+//           >
+//             <Trash2 className="h-4 w-4" />
+//           </button>
+//         </div>
+//       )
+//     }
+//   ];
+
+//   const stats = {
+//     total: salles.length,
+//     totalLits: salles.reduce((sum, salle) => sum + (salle.lits?.length || 0), 0),
+//     litsOccupes: salles.reduce((sum, salle) => 
+//       sum + (salle.lits?.filter(lit => lit.patient).length || 0), 0
+//     ),
+//     servicesActifs: new Set(salles.map(s => s.ID_SERVICE)).size
+//   };
+
+//   if (loading) {
+//     return (
+//       <div className="flex items-center justify-center h-64">
+//         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+//         <span className="ml-2 text-gray-600">Chargement des salles...</span>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="space-y-6">
+//       <div className="flex items-center justify-between">
+//         <h1 className="text-2xl font-bold text-gray-900">Gestion des Salles</h1>
+//         <button
+//           onClick={handleAddSalle}
+//           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+//         >
+//           <Plus className="h-4 w-4" />
+//           <span>Nouvelle Salle</span>
+//         </button>
+//       </div>
+
+//       {error && (
+//         <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center space-x-2">
+//           <AlertCircle className="h-5 w-5 text-red-500" />
+//           <span className="text-red-700">{error}</span>
+//         </div>
+//       )}
+
+//       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+//         <div className="bg-white p-4 rounded-lg border border-gray-200">
+//           <div className="flex items-center justify-between">
+//             <div>
+//               <p className="text-sm text-gray-600">Total Salles</p>
+//               <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+//             </div>
+//             <Building className="h-8 w-8 text-gray-400" />
+//           </div>
+//         </div>
+//         <div className="bg-white p-4 rounded-lg border border-gray-200">
+//           <div className="flex items-center justify-between">
+//             <div>
+//               <p className="text-sm text-gray-600">Services Actifs</p>
+//               <p className="text-2xl font-bold text-blue-600">{stats.servicesActifs}</p>
+//             </div>
+//             <Users className="h-8 w-8 text-blue-400" />
+//           </div>
+//         </div>
+//         <div className="bg-white p-4 rounded-lg border border-gray-200">
+//           <div className="flex items-center justify-between">
+//             <div>
+//               <p className="text-sm text-gray-600">Total Lits</p>
+//               <p className="text-2xl font-bold text-green-600">{stats.totalLits}</p>
+//             </div>
+//             <Bed className="h-8 w-8 text-green-400" />
+//           </div>
+//         </div>
+//         <div className="bg-white p-4 rounded-lg border border-gray-200">
+//           <div className="flex items-center justify-between">
+//             <div>
+//               <p className="text-sm text-gray-600">Taux d'Occupation</p>
+//               <p className="text-2xl font-bold text-purple-600">
+//                 {stats.totalLits > 0 ? Math.round((stats.litsOccupes / stats.totalLits) * 100) : 0}%
+//               </p>
+//             </div>
+//             <Users className="h-8 w-8 text-purple-400" />
+//           </div>
+//         </div>
+//       </div>
+
+//       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+//         <div className="p-6 border-b border-gray-200">
+//           <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+//             <div className="relative flex-1 max-w-md">
+//               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+//               <input
+//                 type="text"
+//                 placeholder="Rechercher une salle..."
+//                 value={searchTerm}
+//                 onChange={(e) => setSearchTerm(e.target.value)}
+//                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
+//               />
+//             </div>
+            
+//             <select
+//               value={serviceFilter}
+//               onChange={(e) => setServiceFilter(e.target.value)}
+//               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+//             >
+//               <option value="">Tous les services</option>
+//               {services.map(service => (
+//                 <option key={service.ID_SERVICE} value={service.ID_SERVICE}>
+//                   {service.NOM_SERVICE}
+//                 </option>
+//               ))}
+//             </select>
+
+//             <div className="text-sm text-gray-500">
+//               {filteredSalles.length} salle(s) trouvée(s)
+//             </div>
+//           </div>
+//         </div>
+
+//         <DataTable
+//           data={filteredSalles}
+//           columns={columns}
+//           keyField="ID_SALLE"
+//         />
+//       </div>
+
+//       {showModal && (
+//         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+//           <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+//             <h2 className="text-xl font-bold mb-4">
+//               {editingSalle ? 'Modifier la Salle' : 'Nouvelle Salle'}
+//             </h2>
+            
+//             <div className="space-y-4">
+//               <div>
+//                 <label className="block text-sm font-medium text-gray-700 mb-1">
+//                   Nom de la salle <span className="text-red-500">*</span>
+//                 </label>
+//                 <input
+//                   type="text"
+//                   value={formData.NOM_SALLE || ''}
+//                   onChange={(e) => setFormData({...formData, NOM_SALLE: e.target.value})}
+//                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+//                   placeholder="Ex: Salle 204, B12, etc."
+//                 />
+//               </div>
+              
+//               <div>
+//                 <label className="block text-sm font-medium text-gray-700 mb-1">
+//                   Service <span className="text-red-500">*</span>
+//                 </label>
+//                 <select
+//                   value={formData.ID_SERVICE || ''}
+//                   onChange={(e) => setFormData({...formData, ID_SERVICE: e.target.value})}
+//                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+//                 >
+//                   <option value="">Sélectionner un service</option>
+//                   {services.map(service => (
+//                     <option key={service.ID_SERVICE} value={service.ID_SERVICE}>
+//                       {service.NOM_SERVICE}
+//                     </option>
+//                   ))}
+//                 </select>
+//               </div>
+
+//               <div className="flex justify-end space-x-3 pt-4">
+//                 <button
+//                   type="button"
+//                   onClick={() => setShowModal(false)}
+//                   disabled={submitting}
+//                   className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50"
+//                 >
+//                   Annuler
+//                 </button>
+//                 <button
+//                   type="button"
+//                   onClick={handleSubmit}
+//                   disabled={submitting || !formData.NOM_SALLE || !formData.ID_SERVICE}
+//                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
+//                 >
+//                   {submitting && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>}
+//                   <span>{editingSalle ? 'Modifier' : 'Créer'}</span>
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default RoomManagement;
+
+
+import React, { useState, useEffect } from 'react';
+import { Plus, Search, Edit, Trash2, Building, Users, Bed, AlertCircle } from 'lucide-react';
 import DataTable from '../UI/DataTable';
 
-interface Room {
-  id: string;
-  numSalle: string;
-  service: string;
-  capacite: number;
-  litsOccupes: number;
-  type: 'Standard' | 'Privée' | 'Soins intensifs' | 'Isolement';
-  equipements: string[];
-  notes?: string;
-  statut: 'Active' | 'Maintenance' | 'Fermée';
+interface Salle {
+  ID_SALLE: string;
+  ID_SERVICE: string;
+  NOM_SALLE: string;
+  lits?: Lit[];
+  service?: Service;
+}
+
+interface Service {
+  ID_SERVICE: string;
+  NOM_SERVICE: string;
+  DESCRIPTION: string;
+  // salles?: Salle[];
+}
+
+interface Lit {
+  ID_LIT: string;
+  ID_SALLE: string;
+  NUM_LIT: string;
+  salle?: Salle;
+  patient?: Patient;
+}
+
+interface Personne {
+  ID_PERSONNE: string;
+  NOM: string;
+  PRENOM: string;
+  DATE_NAISSANCE: string;
+  GENRE: string;
+  TELEPHONE: string;
+  EMAIL: string;
+}
+
+interface Patient {
+  ID_PATIENT: string;
+  ID_PERSONNE: string;
+  ID_LIT: string;
+  DATE_ADMISSION: string;
+  personne?: Personne;
+  lit?: Lit;
 }
 
 const RoomManagement: React.FC = () => {
-  const [rooms, setRooms] = useState<Room[]>([
-    {
-      id: '1',
-      numSalle: '204',
-      service: 'Cardiologie',
-      capacite: 2,
-      litsOccupes: 1,
-      type: 'Standard',
-      equipements: ['Moniteur cardiaque', 'Défibrillateur', 'Oxygène'],
-      notes: 'Salle équipée pour surveillance cardiaque',
-      statut: 'Active'
-    },
-    {
-      id: '2',
-      numSalle: '105',
-      service: 'Neurologie',
-      capacite: 3,
-      litsOccupes: 2,
-      type: 'Soins intensifs',
-      equipements: ['Moniteur neurologique', 'IRM portable', 'Ventilateur', 'Perfusion'],
-      notes: 'Unité de soins intensifs neurologiques',
-      statut: 'Active'
-    },
-    {
-      id: '3',
-      numSalle: '301',
-      service: 'Chirurgie',
-      capacite: 1,
-      litsOccupes: 0,
-      type: 'Privée',
-      equipements: ['Moniteur vital', 'Perfusion', 'Télévision'],
-      notes: 'Chambre privée post-opératoire',
-      statut: 'Active'
-    },
-    {
-      id: '4',
-      numSalle: '150',
-      service: 'Pédiatrie',
-      capacite: 4,
-      litsOccupes: 0,
-      type: 'Standard',
-      equipements: ['Moniteur pédiatrique', 'Jouets', 'Télévision'],
-      notes: 'Salle adaptée aux enfants',
-      statut: 'Maintenance'
-    }
-  ]);
-
+  const [salles, setSalles] = useState<Salle[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [serviceFilter, setServiceFilter] = useState<string>('');
-  const [typeFilter, setTypeFilter] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
   const [showModal, setShowModal] = useState(false);
-  const [editingRoom, setEditingRoom] = useState<Room | null>(null);
-  const [formData, setFormData] = useState<Partial<Room>>({});
+  const [editingSalle, setEditingSalle] = useState<Salle | null>(null);
+  const [formData, setFormData] = useState<Partial<Salle>>({});
+  const [submitting, setSubmitting] = useState(false);
 
-  const filteredRooms = rooms.filter(room => {
-    const matchesSearch = room.numSalle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         room.service.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesService = !serviceFilter || room.service === serviceFilter;
-    const matchesType = !typeFilter || room.type === typeFilter;
-    const matchesStatus = !statusFilter || room.statut === statusFilter;
-    
-    return matchesSearch && matchesService && matchesType && matchesStatus;
+  const API_BASE_URL = 'http://127.0.0.1:8000/api';
+
+
+  const fetchServices = async () => {
+    const response = await fetch(`${API_BASE_URL}/services`);
+    if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+    const data = await response.json();
+    setServices(data.data);
+    return data.data; // 👈 retourne les services
+  };
+
+  const fetchSalles = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/salles`);
+      if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+      const data = await response.json();
+
+
+      const servicesData = await fetchServices(); // 👈 utiliser le retour
+      const enrichedSalles = data.data.map((salle: Salle) => ({
+        ...salle,
+        service: servicesData.find((s: Service) => s.ID_SERVICE === salle.ID_SERVICE)
+      }));
+      setSalles(enrichedSalles);
+      setError(null);
+    } catch (err) {
+      setError(`Erreur lors du chargement des salles: ${err instanceof Error ? err.message : 'Erreur inconnue'}`);
+    }
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
+      await fetchServices();
+      await fetchSalles();
+      setLoading(false);
+    };
+    loadData();
+  }, []);
+
+  const filteredSalles = salles.filter(salle => {
+    const matchesSearch =
+      salle.NOM_SALLE.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (salle.service?.NOM_SERVICE?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
+
+    const matchesService = !serviceFilter || salle.service?.NOM_SERVICE === serviceFilter;
+    return matchesSearch && matchesService;
   });
 
-  const handleAddRoom = () => {
-    setEditingRoom(null);
+  const handleAddSalle = () => {
+    setEditingSalle(null);
     setFormData({
-      numSalle: '',
-      service: '',
-      capacite: 1,
-      litsOccupes: 0,
-      type: 'Standard',
-      equipements: [],
-      notes: '',
-      statut: 'Active'
+      ID_SERVICE: '',
+      NOM_SALLE: ''
     });
     setShowModal(true);
   };
 
-  const handleEditRoom = (room: Room) => {
-    setEditingRoom(room);
-    setFormData(room);
+  const handleEditSalle = (salle: Salle) => {
+    setEditingSalle(salle);
+    setFormData({
+      ID_SERVICE: salle.ID_SERVICE,
+      NOM_SALLE: salle.NOM_SALLE
+    });
     setShowModal(true);
   };
 
-  const handleDeleteRoom = (id: string) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette salle ?')) {
-      setRooms(rooms.filter(r => r.id !== id));
+  const handleDeleteSalle = async (id: string) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette salle ?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/salles/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
+      await fetchSalles();
+    } catch (err) {
+      setError(`Erreur lors de la suppression: ${err instanceof Error ? err.message : 'Erreur inconnue'}`);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    if (!formData.NOM_SALLE || !formData.ID_SERVICE) {
+      setError('Veuillez remplir tous les champs obligatoires');
+      return;
+    }
     
-    if (editingRoom) {
-      setRooms(rooms.map(r => 
-        r.id === editingRoom.id ? { ...formData as Room, id: editingRoom.id } : r
-      ));
-    } else {
-      const newRoom: Room = {
-        ...formData as Room,
-        id: Date.now().toString()
-      };
-      setRooms([...rooms, newRoom]);
-    }
+    setSubmitting(true);
     
-    setShowModal(false);
-    setFormData({});
-  };
+    try {
+      const url = editingSalle 
+        ? `${API_BASE_URL}/salles/${editingSalle.ID_SALLE}`
+        : `${API_BASE_URL}/salles`;
+      
+      const method = editingSalle ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ID_SERVICE: parseInt(formData.ID_SERVICE as string),
+          NOM_SALLE: formData.NOM_SALLE
+        }),
+      });
 
-  const getStatusColor = (statut: string) => {
-    switch (statut) {
-      case 'Active': return 'bg-green-100 text-green-800';
-      case 'Maintenance': return 'bg-yellow-100 text-yellow-800';
-      case 'Fermée': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
+      await fetchSalles();
+      setShowModal(false);
+      setFormData({});
+      setError(null);
+    } catch (err) {
+      setError(`Erreur lors de la sauvegarde: ${err instanceof Error ? err.message : 'Erreur inconnue'}`);
+    } finally {
+      setSubmitting(false);
     }
   };
-
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'Standard': return 'bg-blue-100 text-blue-800';
-      case 'Privée': return 'bg-purple-100 text-purple-800';
-      case 'Soins intensifs': return 'bg-red-100 text-red-800';
-      case 'Isolement': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getOccupancyColor = (occupied: number, capacity: number) => {
-    const rate = occupied / capacity;
-    if (rate === 0) return 'text-green-600';
-    if (rate < 0.7) return 'text-yellow-600';
-    if (rate < 1) return 'text-orange-600';
-    return 'text-red-600';
-  };
-
-  const services = ['Cardiologie', 'Neurologie', 'Chirurgie', 'Pédiatrie', 'Urgences'];
-  const types = ['Standard', 'Privée', 'Soins intensifs', 'Isolement'];
-  const statuses = ['Active', 'Maintenance', 'Fermée'];
 
   const columns = [
     {
       key: 'identification',
       label: 'Identification',
-      render: (room: Room) => (
-        <div className="flex items-center space-x-2">
+      render: (salle: Salle) => (
+        <div className="flex items-center space-x-2 justify-center">
           <Building className="h-5 w-5 text-gray-400" />
           <div>
-            <div className="font-medium text-gray-900">Salle {room.numSalle}</div>
-            <div className="text-sm text-gray-500">{room.service}</div>
+            <div className="font-medium text-gray-900">{salle.NOM_SALLE}</div>
+            <div className="text-sm text-gray-500">{salle.service?.NOM_SERVICE || 'Service inconnu'}</div>
           </div>
         </div>
       )
     },
     {
-      key: 'type',
-      label: 'Type',
-      render: (room: Room) => (
-        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getTypeColor(room.type)}`}>
-          {room.type}
-        </span>
+      key: 'service',
+      label: 'Service',
+      render: (salle: Salle) => (
+        <div>
+          <div className="font-medium text-gray-900">{salle.service?.NOM_SERVICE || 'Service inconnu'}</div>
+          <div className="text-sm text-gray-500">{salle.service?.DESCRIPTION || ''}</div>
+        </div>
       )
     },
     {
       key: 'occupation',
-      label: 'Occupation',
-      render: (room: Room) => (
-        <div className="flex items-center space-x-2">
-          <Users className="h-4 w-4 text-gray-400" />
+      label: 'Lits',
+      render: (salle: Salle) => (
+        <div className="flex items-center space-x-2 justify-center">
+          <Bed className="h-4 w-4 text-gray-400" />
           <div>
-            <div className={`font-medium ${getOccupancyColor(room.litsOccupes, room.capacite)}`}>
-              {room.litsOccupes}/{room.capacite}
+            <div className="font-medium text-blue-600">
+              {salle.lits ? salle.lits.length : 0} lits
             </div>
             <div className="text-xs text-gray-500">
-              {Math.round((room.litsOccupes / room.capacite) * 100)}% occupé
+              {salle.lits ? salle.lits.filter(lit => lit.patient).length : 0} occupés
             </div>
           </div>
         </div>
-      )
-    },
-    {
-      key: 'equipements',
-      label: 'Équipements',
-      render: (room: Room) => (
-        <div className="space-y-1">
-          {room.equipements.slice(0, 2).map((eq, index) => (
-            <div key={index} className="text-xs bg-gray-100 px-2 py-1 rounded">
-              {eq}
-            </div>
-          ))}
-          {room.equipements.length > 2 && (
-            <div className="text-xs text-gray-500">
-              +{room.equipements.length - 2} autres
-            </div>
-          )}
-        </div>
-      )
-    },
-    {
-      key: 'statut',
-      label: 'Statut',
-      render: (room: Room) => (
-        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(room.statut)}`}>
-          {room.statut}
-        </span>
-      )
-    },
-    {
-      key: 'notes',
-      label: 'Notes',
-      render: (room: Room) => (
-        <span className="text-sm text-gray-600 max-w-xs truncate">
-          {room.notes || '-'}
-        </span>
       )
     },
     {
       key: 'actions',
       label: 'Actions',
-      render: (room: Room) => (
-        <div className="flex space-x-2">
+      render: (salle: Salle) => (
+        <div className="flex space-x-2 justify-center">
           <button
-            onClick={() => handleEditRoom(room)}
-            className="text-blue-600 hover:text-blue-800"
+            onClick={() => handleEditSalle(salle)}
+            className="text-blue-600 hover:text-blue-800 p-1"
+            title="Modifier"
           >
             <Edit className="h-4 w-4" />
           </button>
           <button
-            onClick={() => handleDeleteRoom(room.id)}
-            className="text-red-600 hover:text-red-800"
+            onClick={() => salle.ID_SALLE && handleDeleteSalle(salle.ID_SALLE)}
+            className="text-red-600 hover:text-red-800 p-1"
+            title="Supprimer"
           >
             <Trash2 className="h-4 w-4" />
           </button>
@@ -256,18 +701,30 @@ const RoomManagement: React.FC = () => {
   ];
 
   const stats = {
-    total: rooms.length,
-    active: rooms.filter(r => r.statut === 'Active').length,
-    totalCapacity: rooms.reduce((sum, r) => sum + r.capacite, 0),
-    totalOccupied: rooms.reduce((sum, r) => sum + r.litsOccupes, 0)
+    total: salles.length,
+    totalLits: salles.reduce((sum, salle) => sum + (salle.lits?.length || 0), 0),
+    litsOccupes: salles.reduce((sum, salle) => 
+      sum + (salle.lits?.filter(lit => lit.patient).length || 0), 0
+    ),
+    servicesActifs: new Set(salles.map(s => s.ID_SERVICE)).size
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64" style={{marginTop: '100px'}}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestion des Salles</h1>
         <button
-          onClick={handleAddRoom}
+          onClick={handleAddSalle}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
         >
           <Plus className="h-4 w-4" />
@@ -275,7 +732,13 @@ const RoomManagement: React.FC = () => {
         </button>
       </div>
 
-      {/* Statistics */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center space-x-2">
+          <AlertCircle className="h-5 w-5 text-red-500" />
+          <span className="text-red-700">{error}</span>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
@@ -289,19 +752,19 @@ const RoomManagement: React.FC = () => {
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Salles Actives</p>
-              <p className="text-2xl font-bold text-green-600">{stats.active}</p>
+              <p className="text-sm text-gray-600">Services Actifs</p>
+              <p className="text-2xl font-bold text-blue-600">{stats.servicesActifs}</p>
             </div>
-            <Building className="h-8 w-8 text-green-400" />
+            <Users className="h-8 w-8 text-blue-400" />
           </div>
         </div>
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Capacité Totale</p>
-              <p className="text-2xl font-bold text-blue-600">{stats.totalCapacity}</p>
+              <p className="text-sm text-gray-600">Total Lits</p>
+              <p className="text-2xl font-bold text-green-600">{stats.totalLits}</p>
             </div>
-            <Bed className="h-8 w-8 text-blue-400" />
+            <Bed className="h-8 w-8 text-green-400" />
           </div>
         </div>
         <div className="bg-white p-4 rounded-lg border border-gray-200">
@@ -309,7 +772,7 @@ const RoomManagement: React.FC = () => {
             <div>
               <p className="text-sm text-gray-600">Taux d'Occupation</p>
               <p className="text-2xl font-bold text-purple-600">
-                {Math.round((stats.totalOccupied / stats.totalCapacity) * 100)}%
+                {stats.totalLits > 0 ? Math.round((stats.litsOccupes / stats.totalLits) * 100) : 0}%
               </p>
             </div>
             <Users className="h-8 w-8 text-purple-400" />
@@ -338,170 +801,84 @@ const RoomManagement: React.FC = () => {
             >
               <option value="">Tous les services</option>
               {services.map(service => (
-                <option key={service} value={service}>{service}</option>
-              ))}
-            </select>
-
-            <select
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Tous les types</option>
-              {types.map(type => (
-                <option key={type} value={type}>{type}</option>
-              ))}
-            </select>
-
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Tous les statuts</option>
-              {statuses.map(status => (
-                <option key={status} value={status}>{status}</option>
+                <option key={service.ID_SERVICE} value={service.NOM_SERVICE}>
+                  {service.NOM_SERVICE}
+                </option>
               ))}
             </select>
 
             <div className="text-sm text-gray-500">
-              {filteredRooms.length} salle(s) trouvée(s)
+              {filteredSalles.length} salle(s) trouvée(s)
             </div>
           </div>
         </div>
 
         <DataTable
-          data={filteredRooms}
+          data={filteredSalles}
           columns={columns}
-          keyField="id"
+          keyField="ID_SALLE"
         />
       </div>
 
-      {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">
-              {editingRoom ? 'Modifier la Salle' : 'Nouvelle Salle'}
+              {editingSalle ? 'Modifier la Salle' : 'Nouvelle Salle'}
             </h2>
             
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Numéro de salle</label>
-                  <input
-                    type="text"
-                    value={formData.numSalle || ''}
-                    onChange={(e) => setFormData({...formData, numSalle: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Service</label>
-                  <select
-                    value={formData.service || ''}
-                    onChange={(e) => setFormData({...formData, service: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    required
-                  >
-                    <option value="">Sélectionner un service</option>
-                    {services.map(service => (
-                      <option key={service} value={service}>{service}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                  <select
-                    value={formData.type || 'Standard'}
-                    onChange={(e) => setFormData({...formData, type: e.target.value as any})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  >
-                    {types.map(type => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Capacité (lits)</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={formData.capacite || 1}
-                    onChange={(e) => setFormData({...formData, capacite: parseInt(e.target.value)})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Lits occupés</label>
-                  <input
-                    type="number"
-                    min="0"
-                    max={formData.capacite || 1}
-                    value={formData.litsOccupes || 0}
-                    onChange={(e) => setFormData({...formData, litsOccupes: parseInt(e.target.value)})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
-                  <select
-                    value={formData.statut || 'Active'}
-                    onChange={(e) => setFormData({...formData, statut: e.target.value as any})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  >
-                    {statuses.map(status => (
-                      <option key={status} value={status}>{status}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Équipements</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nom de la salle <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
-                  value={formData.equipements?.join(', ') || ''}
-                  onChange={(e) => setFormData({...formData, equipements: e.target.value.split(', ').filter(eq => eq.trim())})}
-                  placeholder="Séparer par des virgules"
+                  value={formData.NOM_SALLE || ''}
+                  onChange={(e) => setFormData({...formData, NOM_SALLE: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="Ex: Salle 204, B12, etc."
                 />
               </div>
-
+              
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                <textarea
-                  value={formData.notes || ''}
-                  onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                  rows={3}
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Service <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.ID_SERVICE || ''}
+                  onChange={(e) => setFormData({...formData, ID_SERVICE: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
+                >
+                  <option value="">Sélectionner un service</option>
+                  {services.map(service => (
+                    <option key={service.ID_SERVICE} value={service.ID_SERVICE}>
+                      {service.NOM_SERVICE}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="flex justify-end space-x-3 pt-4">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                  disabled={submitting}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50"
                 >
                   Annuler
                 </button>
                 <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={submitting || !formData.NOM_SALLE || !formData.ID_SERVICE}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
                 >
-                  {editingRoom ? 'Modifier' : 'Créer'}
+                  {submitting && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>}
+                  <span>{editingSalle ? 'Modifier' : 'Créer'}</span>
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
@@ -510,4 +887,3 @@ const RoomManagement: React.FC = () => {
 };
 
 export default RoomManagement;
-
